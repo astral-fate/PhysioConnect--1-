@@ -183,6 +183,9 @@ const PhysioApp = () => {
           <Button variant="outline" onClick={() => setLocation('/progress')}>
             التقدم
           </Button>
+          <Button variant="outline" onClick={() => setLocation('/exercises')}>
+            التمارين
+          </Button>
           <Button variant="outline" onClick={() => setLocation('/chat')}>
             المحادثة
           </Button>

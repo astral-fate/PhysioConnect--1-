@@ -130,9 +130,14 @@ export default function ChatPage() {
     <div className="max-w-2xl mx-auto p-6 h-screen flex flex-col">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">المحادثة مع المعالج</h1>
-        <Button variant="outline" onClick={() => setLocation('/')}>
-          العودة للرئيسية
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setLocation('/exercises')}>
+            التمارين
+          </Button>
+          <Button variant="outline" onClick={() => setLocation('/')}>
+            العودة للرئيسية
+          </Button>
+        </div>
       </div>
 
       <Card className="flex-1">
@@ -188,14 +193,23 @@ export default function ChatPage() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>التمارين المخصصة</DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              قائمة التمارين المخصصة لحالتك من قبل المعالج
+            </p>
           </DialogHeader>
           <ExerciseSummary 
             exercises={assignedExercises}
             onClose={() => setShowExercises(false)}
           />
           <DialogFooter>
-            <Button onClick={() => setShowExercises(false)}>
-              تم الفهم
+            <Button onClick={() => {
+              setShowExercises(false);
+              setLocation('/exercises');
+            }}>
+              عرض كل التمارين
+            </Button>
+            <Button variant="outline" onClick={() => setShowExercises(false)}>
+              إغلاق
             </Button>
           </DialogFooter>
         </DialogContent>
