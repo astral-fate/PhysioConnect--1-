@@ -1,0 +1,257 @@
+import React, { useState } from 'react';
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Calendar, MessageCircle, Star, Clock, ChevronRight, User, X, Dumbbell } from 'lucide-react';
+
+// Sample data for exercises assigned by trainer
+const assignedExercises = [
+  {
+    id: 1,
+    name: "تمارين تقوية عضلات الظهر",
+    duration: "15 دقيقة",
+    sets: 3,
+    reps: 12,
+    image: "/api/placeholder/200/150",
+    description: "تمارين مخصصة لتقوية عضلات الظهر السفلية"
+  },
+  {
+    id: 2,
+    name: "تمارين تمدد العمود الفقري",
+    duration: "10 دقائق",
+    sets: 2,
+    reps: 10,
+    image: "/api/placeholder/200/150",
+    description: "تمارين لزيادة مرونة العمود الفقري"
+  }
+];
+
+// Sample trainers data
+const trainers = [
+  {
+    id: 1,
+    name: "د. سارة أحمد",
+    specialty: "أخصائية العلاج الطبيعي للعمود الفقري",
+    experience: "10 سنوات",
+    rating: 4.8,
+    reviews: 127,
+    availability: ["الأحد", "الثلاثاء", "الخميس"],
+    image: "/api/placeholder/150/150",
+    bio: "متخصصة في علاج آلام الظهر والعمود الفقري"
+  },
+  {
+    id: 2,
+    name: "د. محمد خالد",
+    specialty: "أخصائي العلاج الطبيعي الرياضي",
+    experience: "8 سنوات",
+    rating: 4.9,
+    reviews: 95,
+    availability: ["السبت", "الاثنين", "الأربعاء"],
+    image: "/api/placeholder/150/150",
+    bio: "متخصص في إصابات الرياضيين وإعادة التأهيل"
+  },
+];
+
+// Chat message component
+const ChatMessage = ({ message }) => (
+  <div className={`flex ${message.sender === 'patient' ? 'justify-end' : 'justify-start'} mb-4`}>
+    <div className={`max-w-[70%] p-3 rounded-lg ${
+      message.sender === 'patient' 
+        ? 'bg-blue-500 text-white' 
+        : 'bg-gray-100'
+    }`}>
+      <p>{message.text}</p>
+      <span className="text-xs opacity-70">
+        {new Date(message.timestamp).toLocaleTimeString('ar-SA')}
+      </span>
+    </div>
+  </div>
+);
+
+// Exercise summary component
+const ExerciseSummary = ({ exercises, onClose }) => (
+  <div className="space-y-4">
+    <div className="flex justify-between items-center mb-4">
+      <h3 className="text-xl font-bold">التمارين المخصصة</h3>
+      <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+        <X className="w-5 h-5" />
+      </button>
+    </div>
+    {exercises.map(exercise => (
+      <Card key={exercise.id} className="overflow-hidden">
+        <div className="flex">
+          <img 
+            src={exercise.image} 
+            alt={exercise.name}
+            className="w-48 h-32 object-cover"
+          />
+          <div className="p-4">
+            <h4 className="font-medium mb-2">{exercise.name}</h4>
+            <div className="text-sm text-gray-600 space-y-1">
+              <p>المدة: {exercise.duration}</p>
+              <p>المجموعات: {exercise.sets}</p>
+              <p>التكرارات: {exercise.reps}</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+    ))}
+  </div>
+);
+
+// Main component
+const PatientPortal = () => {
+  const [showOnboarding, setShowOnboarding] = useState(true);
+  const [showChat, setShowChat] = useState(false);
+  const [showExercises, setShowExercises] = useState(false);
+  const [selectedTrainer, setSelectedTrainer] = useState(null);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [messageInput, setMessageInput] = useState('');
+
+  // Handle sending a message
+  const sendMessage = () => {
+    if (messageInput.trim()) {
+      const newMessage = {
+        text: messageInput,
+        sender: 'patient',
+        timestamp: new Date()
+      };
+      setChatMessages([...chatMessages, newMessage]);
+      setMessageInput('');
+
+      // Simulate trainer response
+      setTimeout(() => {
+        const trainerResponse = {
+          text: 'لقد قمت بتخصيص بعض التمارين لحالتك. يمكنك مراجعتها الآن.',
+          sender: 'trainer',
+          timestamp: new Date()
+        };
+        setChatMessages(prev => [...prev, trainerResponse]);
+        // Show exercises popup after trainer's response
+        setTimeout(() => setShowExercises(true), 1000);
+      }, 1000);
+    }
+  };
+
+  // Handle trainer selection
+  const handleTrainerSelect = (trainer) => {
+    setSelectedTrainer(trainer);
+    setShowChat(true);
+  };
+
+  return (
+    <div className="w-full min-h-screen bg-gray-50" dir="rtl">
+      {/* Main content */}
+      <div className="max-w-7xl mx-auto p-4">
+        <h1 className="text-2xl font-bold mb-6">اختر معالجك</h1>
+
+        {/* Trainers grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {trainers.map(trainer => (
+            <Card 
+              key={trainer.id}
+              className="cursor-pointer hover:border-blue-500 transition-all"
+              onClick={() => handleTrainerSelect(trainer)}
+            >
+              <CardContent className="p-6">
+                <div className="flex gap-4">
+                  <img
+                    src={trainer.image}
+                    alt={trainer.name}
+                    className="w-24 h-24 rounded-full object-cover"
+                  />
+                  <div className="flex-1">
+                    <h3 className="text-xl font-medium mb-2">{trainer.name}</h3>
+                    <p className="text-gray-600 mb-2">{trainer.specialty}</p>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center">
+                        <Star className="w-4 h-4 text-yellow-500 mr-1" />
+                        <span>{trainer.rating}</span>
+                        <span className="text-gray-500 text-sm mr-1">({trainer.reviews} تقييم)</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Clock className="w-4 h-4 text-gray-500 mr-1" />
+                        <span>{trainer.experience}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Chat Dialog */}
+        <Dialog open={showChat} onOpenChange={setShowChat}>
+          <DialogContent className="max-w-2xl max-h-[80vh]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <img
+                  src={selectedTrainer?.image}
+                  alt={selectedTrainer?.name}
+                  className="w-10 h-10 rounded-full"
+                />
+                <span>{selectedTrainer?.name}</span>
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="h-[400px] flex flex-col">
+              <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+                {chatMessages.map((message, index) => (
+                  <ChatMessage key={index} message={message} />
+                ))}
+              </div>
+
+              <div className="flex gap-2 mt-auto">
+                <input
+                  type="text"
+                  value={messageInput}
+                  onChange={(e) => setMessageInput(e.target.value)}
+                  placeholder="اكتب رسالتك هنا..."
+                  className="flex-1 p-2 border rounded-lg"
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                />
+                <button
+                  onClick={sendMessage}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  إرسال
+                </button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Exercises Dialog */}
+        <Dialog open={showExercises} onOpenChange={setShowExercises}>
+          <DialogContent className="max-w-2xl">
+            <ExerciseSummary 
+              exercises={assignedExercises} 
+              onClose={() => setShowExercises(false)}
+            />
+            <DialogFooter>
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors mt-4"
+                onClick={() => setShowExercises(false)}
+              >
+                تم الفهم
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
+  );
+};
+
+export default PatientPortal;
