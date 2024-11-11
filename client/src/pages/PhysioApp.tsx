@@ -244,6 +244,9 @@ const PhysioApp = () => {
           <Button variant="outline" onClick={() => setLocation('/chat')}>
             المحادثة
           </Button>
+          <Button variant="outline" onClick={() => setLocation('/consultant')}>
+            لوحة تحكم الأخصائي
+          </Button>
         </div>
       </div>
       

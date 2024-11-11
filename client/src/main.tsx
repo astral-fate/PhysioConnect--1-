@@ -8,6 +8,7 @@ import PhysioApp from "./pages/PhysioApp";
 import ProgressPage from "./pages/ProgressPage";
 import ChatPage from "./pages/ChatPage";
 import ExercisesPage from "./pages/ExercisesPage";
+import ConsultantDashboard from "./pages/ConsultantDashboard";
 import { Toaster } from "@/components/ui/toaster";
 
 createRoot(document.getElementById("root")!).render(
@@ -19,6 +20,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/progress" component={ProgressPage} />
           <Route path="/chat" component={ChatPage} />
           <Route path="/exercises" component={ExercisesPage} />
+          <Route path="/consultant" component={ConsultantDashboard} />
           <Route>404 - الصفحة غير موجودة</Route>
         </Switch>
         <Toaster />
