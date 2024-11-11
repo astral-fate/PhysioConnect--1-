@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProgressChart } from '../components/ProgressChart';
-import { MuscleVisualization } from '../components/MuscleVisualization';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 
@@ -65,10 +64,11 @@ export default function ProgressPage() {
             <CardTitle>المناطق المستهدفة</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="aspect-square max-w-[300px] mx-auto">
-              <MuscleVisualization 
-                highlightedMuscles={['back', 'shoulders']}
-                progress={75}
+            <div className="aspect-square max-w-[300px] mx-auto bg-muted rounded-lg flex items-center justify-center">
+              <img
+                src="/api/placeholder/300/300"
+                alt="مناطق الألم"
+                className="max-h-[80%] max-w-[80%] object-contain"
               />
             </div>
           </CardContent>
