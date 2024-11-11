@@ -2,7 +2,6 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
-import { MuscleVisualization } from '../components/MuscleVisualization';
 
 interface Exercise {
   id: number;
@@ -11,7 +10,7 @@ interface Exercise {
   sets: number;
   reps: number;
   description: string;
-  muscles: string[];
+  image: string;
 }
 
 const exercises: Exercise[] = [
@@ -22,7 +21,7 @@ const exercises: Exercise[] = [
     sets: 3,
     reps: 12,
     description: "تمارين مخصصة لتقوية عضلات الظهر السفلية",
-    muscles: ['back']
+    image: "/api/placeholder/300/300"
   },
   {
     id: 2,
@@ -31,7 +30,7 @@ const exercises: Exercise[] = [
     sets: 2,
     reps: 10,
     description: "تمارين لزيادة مرونة العمود الفقري",
-    muscles: ['back', 'shoulders']
+    image: "/api/placeholder/300/300"
   },
   {
     id: 3,
@@ -40,7 +39,7 @@ const exercises: Exercise[] = [
     sets: 4,
     reps: 15,
     description: "تمارين لتقوية وتمديد عضلات الكتف",
-    muscles: ['shoulders']
+    image: "/api/placeholder/300/300"
   }
 ];
 
@@ -77,10 +76,11 @@ export default function ExercisesPage() {
                   </div>
                   <p>{exercise.description}</p>
                 </div>
-                <div className="aspect-square max-w-[300px] mx-auto">
-                  <MuscleVisualization 
-                    highlightedMuscles={exercise.muscles}
-                    progress={100}
+                <div className="aspect-square max-w-[300px] mx-auto bg-muted rounded-lg flex items-center justify-center">
+                  <img
+                    src={exercise.image}
+                    alt={exercise.name}
+                    className="max-h-[80%] max-w-[80%] object-contain"
                   />
                 </div>
               </div>

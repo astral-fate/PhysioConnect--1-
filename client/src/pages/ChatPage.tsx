@@ -10,10 +10,10 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { X } from 'lucide-react';
-import { MuscleVisualization } from '../components/MuscleVisualization';
 
 interface Message {
   id: number;
@@ -31,7 +31,6 @@ interface Exercise {
   reps: number;
   image: string;
   description: string;
-  muscles: string[];
 }
 
 const assignedExercises: Exercise[] = [
@@ -41,9 +40,8 @@ const assignedExercises: Exercise[] = [
     duration: "١٥ دقيقة",
     sets: 3,
     reps: 12,
-    image: "/api/placeholder/200/150",
-    description: "تمارين مخصصة لتقوية عضلات الظهر السفلية",
-    muscles: ['back']
+    image: "/api/placeholder/300/300",
+    description: "تمارين مخصصة لتقوية عضلات الظهر السفلية"
   },
   {
     id: 2,
@@ -51,9 +49,8 @@ const assignedExercises: Exercise[] = [
     duration: "١٠ دقائق",
     sets: 2,
     reps: 10,
-    image: "/api/placeholder/200/150",
-    description: "تمارين لزيادة مرونة العمود الفقري",
-    muscles: ['back', 'shoulders']
+    image: "/api/placeholder/300/300",
+    description: "تمارين لزيادة مرونة العمود الفقري"
   }
 ];
 
@@ -77,10 +74,11 @@ const ExerciseSummary = ({ exercises, onClose }: { exercises: Exercise[], onClos
             </div>
             <p className="text-sm">{exercise.description}</p>
           </div>
-          <div className="h-40">
-            <MuscleVisualization 
-              highlightedMuscles={exercise.muscles}
-              progress={100}
+          <div className="aspect-square max-w-[300px] mx-auto bg-muted rounded-lg flex items-center justify-center">
+            <img
+              src={exercise.image}
+              alt={exercise.name}
+              className="max-h-[80%] max-w-[80%] object-contain"
             />
           </div>
         </div>
@@ -193,9 +191,9 @@ export default function ChatPage() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>التمارين المخصصة</DialogTitle>
-            <p className="text-sm text-muted-foreground">
+            <DialogDescription>
               قائمة التمارين المخصصة لحالتك من قبل المعالج
-            </p>
+            </DialogDescription>
           </DialogHeader>
           <ExerciseSummary 
             exercises={assignedExercises}

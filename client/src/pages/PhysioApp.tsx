@@ -25,11 +25,11 @@ const PhysioApp = () => {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
-  // Dummy data for prototype with more commonly supported emojis
+  // Dummy data for prototype with more universally supported emojis
   const dummyInjuryAreas = [
     { id: 'neck', name: 'ألم الرقبة', icon: '😣' },
     { id: 'back', name: 'ألم الظهر', icon: '⚡' },
-    { id: 'knee', name: 'ألم الركبة', icon: '🦵' },
+    { id: 'knee', name: 'ألم الركبة', icon: '🦶' },
     { id: 'shoulder', name: 'الكتف', icon: '💪' },
   ];
 
