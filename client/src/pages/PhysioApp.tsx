@@ -15,7 +15,6 @@ import {
 import { Clock, Calendar as CalendarIcon } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { toArabicDate, toArabicTime } from '../lib/arabic-utils';
-import { MuscleVisualization } from '../components/MuscleVisualization';
 
 const PhysioApp = () => {
   const [_, setLocation] = useLocation();
@@ -26,12 +25,12 @@ const PhysioApp = () => {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
-  // Dummy data for prototype
+  // Dummy data for prototype with more commonly supported emojis
   const dummyInjuryAreas = [
-    { id: 'neck', name: 'ألم الرقبة', muscles: ['neck'] },
-    { id: 'back', name: 'ألم الظهر', muscles: ['back'] },
-    { id: 'knee', name: 'ألم الركبة', muscles: ['legs'] },
-    { id: 'shoulder', name: 'الكتف', muscles: ['shoulders'] },
+    { id: 'neck', name: 'ألم الرقبة', icon: '😣' },
+    { id: 'back', name: 'ألم الظهر', icon: '⚡' },
+    { id: 'knee', name: 'ألم الركبة', icon: '🦵' },
+    { id: 'shoulder', name: 'الكتف', icon: '💪' },
   ];
 
   const dummyTrainers = [
@@ -64,13 +63,8 @@ const PhysioApp = () => {
             onClick={() => setSelectedArea(area.id)}
           >
             <CardContent className="flex flex-col items-center justify-center p-6">
-              <span className="text-lg font-medium mb-4">{area.name}</span>
-              <div className="w-32 h-32">
-                <MuscleVisualization 
-                  highlightedMuscles={area.muscles}
-                  progress={selectedArea === area.id ? 100 : 0}
-                />
-              </div>
+              <span className="text-4xl mb-4 emoji" role="img" aria-label={area.name}>{area.icon}</span>
+              <span className="text-lg font-medium">{area.name}</span>
             </CardContent>
           </Card>
         ))}
@@ -106,7 +100,7 @@ const PhysioApp = () => {
                 <h3 className="text-lg font-medium">{trainer.name}</h3>
                 <p className="text-sm text-muted-foreground">{trainer.specialty}</p>
                 <div className="flex items-center mt-1">
-                  {'⭐'.repeat(Math.floor(trainer.rating))}
+                  <span className="emoji">{'⭐'.repeat(Math.floor(trainer.rating))}</span>
                   <span className="mr-1 text-sm text-muted-foreground">{trainer.rating}</span>
                 </div>
               </div>
@@ -148,7 +142,7 @@ const PhysioApp = () => {
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-center">اختر موعد الجلسة</h2>
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-4 flex justify-center">
             <Calendar
               mode="single"
               selected={selectedDate}
@@ -204,7 +198,9 @@ const PhysioApp = () => {
               </Avatar>
               <div className="flex-1">
                 <h3 className="font-medium">{appointment.trainer.name}</h3>
-                <p className="text-sm text-muted-foreground">{appointment.area.name}</p>
+                <p className="text-sm text-muted-foreground">
+                  <span className="emoji" role="img" aria-label={appointment.area.name}>{appointment.area.icon}</span> {appointment.area.name}
+                </p>
                 <div className="flex items-center text-sm text-muted-foreground mt-1">
                   <CalendarIcon className="ml-2 h-4 w-4 rtl-flip" />
                   {toArabicDate(appointment.date)}
@@ -239,13 +235,13 @@ const PhysioApp = () => {
       <AlertDialog open={showConfirmation} onOpenChange={setShowConfirmation}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>تم تأكيد الموعد!</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-right">تم تأكيد الموعد!</AlertDialogTitle>
+            <AlertDialogDescription className="text-right">
               تم حجز موعدك بنجاح مع {selectedTrainer?.name}.
               سنرسل لك تفاصيل الموعد عبر البريد الإلكتروني.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="sm:justify-start">
             <AlertDialogAction onClick={() => {
               setShowConfirmation(false);
               setStep('home');
