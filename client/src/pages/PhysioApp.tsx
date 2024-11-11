@@ -3,6 +3,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from "@/components/ui/badge";
 import { 
   AlertDialog,
   AlertDialogContent,
@@ -37,16 +38,32 @@ const PhysioApp = () => {
     {
       id: 'T1',
       name: 'د. أحمد حسن',
-      specialty: 'العلاج الطبيعي العام',
+      education: 'بكالوريوس العلاج الطبيعي',
+      experience: '٧ سنوات',
+      specialties: ['العلاج الطبيعي العام', 'تدريب القوة'],
+      populations: ['كبار السن', 'ذوي الأحجام الكبيرة'],
       rating: 4.8,
-      image: '/api/placeholder/150/150'
+      image: '/api/placeholder/150/150',
+      isTopChoice: true,
+      availability: {
+        'الجمعة': ['9:00 م', '9:30 م', '10:00 م'],
+        'السبت': ['9:30 م', '10:00 م', '10:30 م']
+      }
     },
     {
       id: 'T2',
       name: 'د. سارة محمد',
-      specialty: 'العلاج الرياضي',
+      education: 'بكالوريوس العلاج الطبيعي',
+      experience: '٥ سنوات',
+      specialties: ['العلاج الرياضي', 'إعادة التأهيل'],
+      populations: ['الرياضيين'],
       rating: 4.9,
-      image: '/api/placeholder/150/150'
+      image: '/api/placeholder/150/150',
+      isTopChoice: false,
+      availability: {
+        'الخميس': ['5:00 م', '5:30 م', '6:00 م'],
+        'الجمعة': ['4:00 م', '4:30 م', '5:00 م']
+      }
     }
   ];
 
@@ -82,7 +99,7 @@ const PhysioApp = () => {
   const OnboardingTrainer = () => (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-center">اختر المعالج</h2>
-      <div className="space-y-4">
+      <div className="space-y-6">
         {dummyTrainers.map((trainer) => (
           <Card 
             key={trainer.id}
@@ -91,17 +108,62 @@ const PhysioApp = () => {
             }`}
             onClick={() => setSelectedTrainer(trainer)}
           >
-            <CardContent className="flex items-center p-4 gap-4">
-              <Avatar className="h-16 w-16">
-                <AvatarImage src={trainer.image} alt={trainer.name} />
-                <AvatarFallback>{trainer.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <h3 className="text-lg font-medium">{trainer.name}</h3>
-                <p className="text-sm text-muted-foreground">{trainer.specialty}</p>
-                <div className="flex items-center mt-1">
-                  <span className="emoji">{'⭐'.repeat(Math.floor(trainer.rating))}</span>
-                  <span className="mr-1 text-sm text-muted-foreground">{trainer.rating}</span>
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex gap-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarImage src={trainer.image} alt={trainer.name} />
+                    <AvatarFallback>{trainer.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="text-lg font-medium">{trainer.name}</h3>
+                    <div className="flex items-center mt-1 text-sm text-muted-foreground">
+                      <span className="ml-2">{trainer.education}</span>
+                      <span className="mx-2">•</span>
+                      <span>{trainer.experience}</span>
+                    </div>
+                    <div className="flex items-center mt-1">
+                      <span className="emoji">{'⭐'.repeat(Math.floor(trainer.rating))}</span>
+                      <span className="mr-1 text-sm text-muted-foreground">{trainer.rating}</span>
+                    </div>
+                  </div>
+                </div>
+                {trainer.isTopChoice && (
+                  <Badge variant="default" className="bg-green-500 hover:bg-green-600">
+                    الاختيار الأفضل
+                  </Badge>
+                )}
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  {trainer.specialties.map((specialty, index) => (
+                    <Badge key={index} variant="secondary">
+                      {specialty}
+                    </Badge>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {trainer.populations.map((population, index) => (
+                    <Badge key={index} variant="outline">
+                      {population}
+                    </Badge>
+                  ))}
+                </div>
+
+                <div className="mt-4 space-y-2">
+                  <h4 className="font-medium text-sm">المواعيد المتاحة:</h4>
+                  {Object.entries(trainer.availability).map(([day, times]) => (
+                    <div key={day} className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-medium ml-2">{day}:</span>
+                      {times.map((time, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {time}
+                        </Badge>
+                      ))}
+                    </div>
+                  ))}
                 </div>
               </div>
             </CardContent>
