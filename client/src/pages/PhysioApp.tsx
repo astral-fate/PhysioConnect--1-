@@ -28,10 +28,10 @@ const PhysioApp = () => {
 
   // Dummy data for prototype
   const dummyInjuryAreas = [
-    { id: 'neck', name: 'ألم الرقبة', icon: '🤕', muscles: ['neck'] },
-    { id: 'back', name: 'ألم الظهر', icon: '⚡', muscles: ['back'] },
-    { id: 'knee', name: 'ألم الركبة', icon: '🦿', muscles: ['legs'] },
-    { id: 'shoulder', name: 'الكتف', icon: '💪', muscles: ['shoulders'] },
+    { id: 'neck', name: 'ألم الرقبة', muscles: ['neck'] },
+    { id: 'back', name: 'ألم الظهر', muscles: ['back'] },
+    { id: 'knee', name: 'ألم الركبة', muscles: ['legs'] },
+    { id: 'shoulder', name: 'الكتف', muscles: ['shoulders'] },
   ];
 
   const dummyTrainers = [
@@ -64,9 +64,8 @@ const PhysioApp = () => {
             onClick={() => setSelectedArea(area.id)}
           >
             <CardContent className="flex flex-col items-center justify-center p-6">
-              <span className="text-4xl mb-2">{area.icon}</span>
-              <span className="text-lg font-medium">{area.name}</span>
-              <div className="w-32 h-32 mt-4">
+              <span className="text-lg font-medium mb-4">{area.name}</span>
+              <div className="w-32 h-32">
                 <MuscleVisualization 
                   highlightedMuscles={area.muscles}
                   progress={selectedArea === area.id ? 100 : 0}
