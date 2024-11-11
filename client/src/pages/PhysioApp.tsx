@@ -1,68 +1,258 @@
-import React from 'react';
-import { Link } from 'wouter';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import React, { useState } from 'react';
 import { Calendar } from '@/components/ui/calendar';
-import useSWR from 'swr';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import { Clock, Calendar as CalendarIcon } from 'lucide-react';
+import { useLocation } from 'wouter';
+import { toArabicDate, toArabicTime } from '../lib/arabic-utils';
+import { MuscleVisualization } from '../components/MuscleVisualization';
 
 const PhysioApp = () => {
-  const { data: appointments } = useSWR('/api/appointments');
-  const { data: profile } = useSWR('/api/profile');
+  const [_, setLocation] = useLocation();
+  const [step, setStep] = useState('onboarding-injury');
+  const [selectedArea, setSelectedArea] = useState<string | null>(null);
+  const [selectedTrainer, setSelectedTrainer] = useState<any | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
-  return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">مرحباً {profile?.name}</h1>
-        <div className="space-x-4 flex">
-          <Button asChild variant="outline">
-            <Link href="/chat">المحادثات</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href="/progress">التقدم</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/book">حجز موعد جديد</Link>
-          </Button>
-        </div>
+  // Dummy data for prototype
+  const dummyInjuryAreas = [
+    { id: 'neck', name: 'ألم الرقبة', icon: '🤕', muscles: ['neck'] },
+    { id: 'back', name: 'ألم الظهر', icon: '⚡', muscles: ['back'] },
+    { id: 'knee', name: 'ألم الركبة', icon: '🦿', muscles: ['legs'] },
+    { id: 'shoulder', name: 'الكتف', icon: '💪', muscles: ['shoulders'] },
+  ];
+
+  const dummyTrainers = [
+    {
+      id: 'T1',
+      name: 'د. أحمد حسن',
+      specialty: 'العلاج الطبيعي العام',
+      rating: 4.8,
+      image: '/api/placeholder/150/150'
+    },
+    {
+      id: 'T2',
+      name: 'د. سارة محمد',
+      specialty: 'العلاج الرياضي',
+      rating: 4.9,
+      image: '/api/placeholder/150/150'
+    }
+  ];
+
+  const OnboardingInjury = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-center">أين تشعر بالألم؟</h2>
+      <div className="grid grid-cols-2 gap-4">
+        {dummyInjuryAreas.map((area) => (
+          <Card 
+            key={area.id}
+            className={`cursor-pointer transition-colors hover:border-primary ${
+              selectedArea === area.id ? 'border-primary bg-primary/5' : ''
+            }`}
+            onClick={() => setSelectedArea(area.id)}
+          >
+            <CardContent className="flex flex-col items-center justify-center p-6">
+              <span className="text-4xl mb-2">{area.icon}</span>
+              <span className="text-lg font-medium">{area.name}</span>
+              <div className="w-32 h-32 mt-4">
+                <MuscleVisualization 
+                  highlightedMuscles={area.muscles}
+                  progress={selectedArea === area.id ? 100 : 0}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
+      <Button 
+        className="w-full" 
+        disabled={!selectedArea}
+        onClick={() => setStep('onboarding-trainer')}
+      >
+        متابعة
+      </Button>
+    </div>
+  );
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>المواعيد القادمة</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {appointments?.map((apt: any) => (
-              <div key={apt.id} className="flex items-center space-x-4 py-3">
-                <Avatar>
-                  <AvatarImage src={apt.therapist.image} />
-                  <AvatarFallback>{apt.therapist.name[0]}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-medium">{apt.therapist.name}</p>
-                  <p className="text-sm text-gray-500">
-                    {new Date(apt.date).toLocaleDateString('ar-SA')}
-                  </p>
+  const OnboardingTrainer = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-center">اختر المعالج</h2>
+      <div className="space-y-4">
+        {dummyTrainers.map((trainer) => (
+          <Card 
+            key={trainer.id}
+            className={`cursor-pointer transition-colors hover:border-primary ${
+              selectedTrainer?.id === trainer.id ? 'border-primary bg-primary/5' : ''
+            }`}
+            onClick={() => setSelectedTrainer(trainer)}
+          >
+            <CardContent className="flex items-center p-4 gap-4">
+              <Avatar className="h-16 w-16">
+                <AvatarImage src={trainer.image} alt={trainer.name} />
+                <AvatarFallback>{trainer.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <h3 className="text-lg font-medium">{trainer.name}</h3>
+                <p className="text-sm text-muted-foreground">{trainer.specialty}</p>
+                <div className="flex items-center mt-1">
+                  {'⭐'.repeat(Math.floor(trainer.rating))}
+                  <span className="mr-1 text-sm text-muted-foreground">{trainer.rating}</span>
                 </div>
               </div>
-            ))}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <div className="flex gap-4 flex-row-reverse">
+        <Button 
+          className="flex-1" 
+          disabled={!selectedTrainer}
+          onClick={() => setStep('onboarding-schedule')}
+        >
+          متابعة
+        </Button>
+        <Button variant="outline" onClick={() => setStep('onboarding-injury')}>
+          رجوع
+        </Button>
+      </div>
+    </div>
+  );
 
+  const OnboardingSchedule = () => {
+    const handleSchedule = () => {
+      if (!selectedDate) return;
+      
+      setAppointments([
+        ...appointments,
+        {
+          date: selectedDate,
+          trainer: selectedTrainer,
+          area: dummyInjuryAreas.find(a => a.id === selectedArea)
+        }
+      ]);
+      setShowConfirmation(true);
+    };
+
+    return (
+      <div className="space-y-6">
+        <h2 className="text-2xl font-bold text-center">اختر موعد الجلسة</h2>
         <Card>
-          <CardHeader>
-            <CardTitle>التقويم</CardTitle>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="p-4">
             <Calendar
               mode="single"
-              selected={new Date()}
-              className="rounded-md border"
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              className="rounded-md border mx-auto"
+              disabled={(date) => date < new Date()}
             />
           </CardContent>
         </Card>
+        <div className="flex gap-4 flex-row-reverse">
+          <Button 
+            className="flex-1" 
+            disabled={!selectedDate}
+            onClick={handleSchedule}
+          >
+            تأكيد الموعد
+          </Button>
+          <Button variant="outline" onClick={() => setStep('onboarding-trainer')}>
+            رجوع
+          </Button>
+        </div>
       </div>
+    );
+  };
+
+  const HomePage = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">أهلاً بك!</h1>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setLocation('/progress')}>
+            التقدم
+          </Button>
+          <Button variant="outline" onClick={() => setLocation('/chat')}>
+            المحادثة
+          </Button>
+        </div>
+      </div>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>المواعيد القادمة</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {appointments.map((appointment, index) => (
+            <div key={index} className="flex items-center gap-4 py-3 border-b last:border-b-0">
+              <Avatar>
+                <AvatarImage src={appointment.trainer.image} />
+                <AvatarFallback>{appointment.trainer.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <h3 className="font-medium">{appointment.trainer.name}</h3>
+                <p className="text-sm text-muted-foreground">{appointment.area.name}</p>
+                <div className="flex items-center text-sm text-muted-foreground mt-1">
+                  <CalendarIcon className="ml-2 h-4 w-4 rtl-flip" />
+                  {toArabicDate(appointment.date)}
+                </div>
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <Clock className="ml-2 h-4 w-4" />
+                  {toArabicTime(appointment.date)}
+                </div>
+              </div>
+              <Button variant="outline">تغيير الموعد</Button>
+            </div>
+          ))}
+          {appointments.length === 0 && (
+            <p className="text-center text-muted-foreground py-4">لا توجد مواعيد قادمة</p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Button className="w-full" onClick={() => setStep('onboarding-injury')}>
+        حجز موعد جديد
+      </Button>
+    </div>
+  );
+
+  return (
+    <div className="max-w-2xl mx-auto p-6">
+      {step === 'onboarding-injury' && <OnboardingInjury />}
+      {step === 'onboarding-trainer' && <OnboardingTrainer />}
+      {step === 'onboarding-schedule' && <OnboardingSchedule />}
+      {step === 'home' && <HomePage />}
+
+      <AlertDialog open={showConfirmation} onOpenChange={setShowConfirmation}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>تم تأكيد الموعد!</AlertDialogTitle>
+            <AlertDialogDescription>
+              تم حجز موعدك بنجاح مع {selectedTrainer?.name}.
+              سنرسل لك تفاصيل الموعد عبر البريد الإلكتروني.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => {
+              setShowConfirmation(false);
+              setStep('home');
+            }}>
+              الذهاب إلى لوحة التحكم
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

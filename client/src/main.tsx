@@ -4,11 +4,10 @@ import { Switch, Route } from "wouter";
 import "./index.css";
 import { SWRConfig } from "swr";
 import { fetcher } from "./lib/fetcher";
-import { Toaster } from "@/components/ui/toaster";
 import PhysioApp from "./pages/PhysioApp";
-import BookingFlow from "./pages/BookingFlow";
-import Progress from "./pages/Progress";
-import Chat from "./pages/Chat";
+import ProgressPage from "./pages/ProgressPage";
+import ChatPage from "./pages/ChatPage";
+import { Toaster } from "@/components/ui/toaster";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -16,9 +15,8 @@ createRoot(document.getElementById("root")!).render(
       <div dir="rtl">
         <Switch>
           <Route path="/" component={PhysioApp} />
-          <Route path="/book" component={BookingFlow} />
-          <Route path="/progress" component={Progress} />
-          <Route path="/chat" component={Chat} />
+          <Route path="/progress" component={ProgressPage} />
+          <Route path="/chat" component={ChatPage} />
           <Route>404 - الصفحة غير موجودة</Route>
         </Switch>
         <Toaster />
